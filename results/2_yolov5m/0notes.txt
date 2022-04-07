@@ -1,0 +1,2 @@
+YOLOv5 🚀 v6.1-110-g0ca85ed torch 1.10.0+cu111 CUDA:0 (Tesla T4, 15110MiB)
+Speed: 0.2ms pre-process, 6.2ms inference, 2.1ms NMS per image at shape (32, 3, 640, 640)
