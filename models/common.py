@@ -39,10 +39,10 @@ class Experimental(nn.Module):
         super().__init__()
 
     def forward(self, x):
-        return nn.SiLU(inplace=True)
+        return nn.ReLU(inplace=True)
         
     def extra_repr(self) -> str:
-        return ''
+        return 'nn.ReLU(inplace=True)'
 
 
 class Conv(nn.Module):
