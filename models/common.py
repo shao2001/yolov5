@@ -34,6 +34,16 @@ def autopad(k, p=None):  # kernel, padding
         p = k // 2 if isinstance(k, int) else (x // 2 for x in k)  # auto-pad
     return p
 
+class Experimental(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def forward(self, x):
+        return nn.SiLU(inplace=True)
+        
+    def extra_repr(self) -> str:
+        return ''
+
 
 class Conv(nn.Module):
     # Standard convolution
@@ -41,7 +51,7 @@ class Conv(nn.Module):
         super().__init__()
         self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p), groups=g, bias=False)
         self.bn = nn.BatchNorm2d(c2)
-        self.act = nn.SiLU() if act is True else (act if isinstance(act, nn.Module) else nn.Identity())
+        self.act = Experimental() if act is True else (act if isinstance(act, nn.Module) else nn.Identity())
 
     def forward(self, x):
         return self.act(self.bn(self.conv(x)))
@@ -115,7 +125,7 @@ class BottleneckCSP(nn.Module):
         self.cv3 = nn.Conv2d(c_, c_, 1, 1, bias=False)
         self.cv4 = Conv(2 * c_, c2, 1, 1)
         self.bn = nn.BatchNorm2d(2 * c_)  # applied to cat(cv2, cv3)
-        self.act = nn.SiLU()
+        self.act = Experimental()
         self.m = nn.Sequential(*(Bottleneck(c_, c_, shortcut, g, e=1.0) for _ in range(n)))
 
     def forward(self, x):
