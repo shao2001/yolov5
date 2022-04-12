@@ -160,6 +160,10 @@ def run(
     iouv = torch.linspace(0.5, 0.95, 10, device=device)  # iou vector for mAP@0.5:0.95
     niou = iouv.numel()
 
+    # save model info for debugging
+    with open(save_dir / 'model_info.txt', 'w') as writer:
+        writer.write(str(model))
+
     # Dataloader
     if not training:
         model.warmup(imgsz=(1 if pt else batch_size, 3, imgsz, imgsz))  # warmup
