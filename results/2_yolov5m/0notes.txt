@@ -1,2 +1,8 @@
 YOLOv5 🚀 v6.1-110-g0ca85ed torch 1.10.0+cu111 CUDA:0 (Tesla T4, 15110MiB)
 Speed: 0.2ms pre-process, 6.2ms inference, 2.1ms NMS per image at shape (32, 3, 640, 640)
+
+
+YOLOv5 🚀 b8973fc torch 1.10.0+cu111 CUDA:0 (Tesla P100-PCIE-16GB, 16281MiB)
+ Class     Images     Labels          P          R     mAP@.5 mAP@.5:.95
+  all       5000      36335      0.729      0.576      0.638      0.443
+Speed: 0.2ms pre-process, 7.8ms inference, 2.4ms NMS per image at shape (32, 3, 640, 640)
