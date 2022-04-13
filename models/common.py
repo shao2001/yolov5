@@ -37,9 +37,10 @@ def autopad(k, p=None):  # kernel, padding
 class Experimental(nn.Module):
     def __init__(self) -> None:
         super().__init__()
+        self.fn = nn.ReLU(inplace=True)
 
     def forward(self, x):
-        return nn.ReLU(inplace=True)
+        return self.fn(x)
         
     def extra_repr(self) -> str:
         return 'nn.ReLU(inplace=True)'
