@@ -39,32 +39,31 @@ seg16 = [
     [0.0000453978687024343,0.0623858513799944,0.124553358187416,0.186942613968046,0.249739894404882,0.312168669417159,0.37519352553157,0.437823499114201,0.5,0.562176500885798,0.624806474468429,0.68783133058284,0.750260105595117,0.813057386031953,0.875446641812583,0.937614148620005,]
 ]
 
+x_min = min(seg16[0])
+x_max = max(seg16[0])
+y_min = min(seg16[1])
+y_max = max(seg16[1])
+
+def map_value(x):
+    if x < x_min:
+        return y_min
+    elif x > x_max:
+        return y_max
+    else:
+        for i in range(len(seg16[0])-1):
+            if seg16[0][i] < x and x < seg16[0][i+1]:
+                return (seg16[0][i+1]-seg16[0][i]) / (seg16[1][i+1]-seg16[1][i]) * (x-seg16[0][i])
+
+
 class Experimental(nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        self.x_list = seg16[0]
-        self.y_list = seg16[1]
-        self.x_min = min(self.x_list)
-        self.x_max = max(self.x_list)
-        self.y_min = min(self.y_list)
-        self.y_max = max(self.y_list)
-        self.fn = self.map_value
 
-    def forward(self, x):
-        return self.fn(x)
+    def forward(self, x: torch.Tensor):
+        return x.apply_(self.map_value)
         
     def extra_repr(self) -> str:
         return ''
-
-    def map_value(self, x):
-        if x < self.x_min:
-            return self.y_min
-        elif x > self.x_max:
-            return self.y_max
-        else:
-            for i in range(len(self.x_list)-1):
-                if self.x_list[i] < x and x < self.x_list[i+1]:
-                    return (self.x_list[i+1]-self.x_list[i]) / (self.y_list[i+1]-self.y_list[i]) * (x-self.x_list[i])
 
 
 class Conv(nn.Module):
