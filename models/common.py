@@ -50,14 +50,14 @@ y_min = min(seg128[1])
 y_max = max(seg128[1])
 
 def map_value(x):
-    if x < x_min:
+    if x <= x_min:
         return y_min
-    elif x > x_max:
+    elif x >= x_max:
         return y_max
     else:
-        for i in range(len(seg128[0])-1):
-            if seg128[0][i] <= x and x <= seg128[0][i+1]:
-                return (seg128[0][i+1]-seg128[0][i]) / (seg128[1][i+1]-seg128[1][i]) * (x-seg16[0][i])
+        for i in range(0, len(seg128[0])-1):
+            if seg128[0][i] < x and x <= seg128[0][i+1]:
+                return (seg128[0][i+1]-seg128[0][i]) / (seg128[1][i+1]-seg128[1][i]) * (x-seg128[0][i])
 
 
 class Experimental(nn.Module):
@@ -65,7 +65,9 @@ class Experimental(nn.Module):
         super().__init__()
 
     def forward(self, x: torch.Tensor):
-        return x.apply_(map_value)
+        x2 = x.clone()
+        x1 = (x.apply_(map_value))
+        return x2 * x1
         
     def extra_repr(self) -> str:
         return 'seg128'
