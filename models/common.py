@@ -57,7 +57,7 @@ def map_value(x):
     else:
         for i in range(0, len(seg128[0])-1):
             if seg128[0][i] < x and x <= seg128[0][i+1]:
-                return (seg128[0][i+1]-seg128[0][i]) / (seg128[1][i+1]-seg128[1][i]) * (x-seg128[0][i])
+                return seg128[1][i] +  (seg128[1][i+1]-seg128[1][i]) / (seg128[0][i+1]-seg128[0][i]) * (x-seg128[0][i])
 
 
 class Experimental(nn.Module):
