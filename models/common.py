@@ -86,7 +86,7 @@ class LookUpTable:
         else:
             return self.cal_value(x, 0, len(seg[0])-1)
 
-looktable = LookUpTable(seg16)
+lut = LookUpTable(seg16)
 """
 x_min = min(seg128[0])
 x_max = max(seg128[0])
@@ -103,13 +103,27 @@ def map_value(x):
                 return seg128[1][i] +  (seg128[1][i+1]-seg128[1][i]) / (seg128[0][i+1]-seg128[0][i]) * (x-seg128[0][i])
 """
 
+def map_value_gpu(x: torch.Tensor):
+    "mimic sigmoid"
+    ret = torch.zeros(x.shape, dtype=x.dtype, device=x.device)
+    # less than x_min
+    ret += (x <= lut.x_min) * lut.y_min
+    # larger than x_max
+    ret += (x > lut.x_max) * lut.y_max
+    # iterate values between them
+    for i in range(0, len(lut.seg[0])-1):
+        v = lut.seg[1][i] + (lut.seg[1][i+1]-lut.seg[1][i]) / (lut.seg[0][i+1]-lut.seg[0][i]) * (x-lut.seg[0][i])
+        ret += ((lut.seg[0][i] < x) & (x <= lut.seg[0][i+1])) * v
+    return ret
+
+
 class Experimental(nn.Module):
     def __init__(self) -> None:
         super().__init__()
 
     def forward(self, x: torch.Tensor):
         x2 = x.clone()
-        x1 = (x.apply_(looktable.map_value))
+        x1 = (x.apply_(lut.map_value))
         return x2 * x1
         
     def extra_repr(self) -> str:
