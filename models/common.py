@@ -34,16 +34,43 @@ def autopad(k, p=None):  # kernel, padding
         p = k // 2 if isinstance(k, int) else (x // 2 for x in k)  # auto-pad
     return p
 
+def approx1(x: torch.Tensor):
+    x_new = torch.zeros(x.size(), dtype=x.dtype, device=x.device)
+    x_new += ((-8 <= x) & (x <= -1.6)) * ((8 - x.abs())/64)    # -8 <= x <= 1.6
+    x_new += ((-1.6 < x) & (x < 1.6)) * (x/4 + 0.5)
+    x_new += ((1.6 <= x) & (x <= 8)) * (1 - (8 - x.abs())/64) # 1.6 <= x <= 8
+    x_new += (x > 8) * 1
+    return x_new
+
+def approx2(x: torch.Tensor):
+    x_new = torch.zeros(x.size(), dtype=x.dtype, device=x.device)
+    x_abs = x.abs()
+    # x_new += (x < 0) * (1 - x)    # x < 0
+    # x_new += ((-1 <= x) & (x < 0)) * (0.25 * x + 0.5)
+    x_new += ((0 <= x_abs) & (x_abs < 1)) * (0.25 * x_abs + 0.5) # 0 <= x < 1
+    x_new += ((1 <= x_abs) & (x_abs < 2.375)) * (0.125 * x_abs + 0.625) # 1 <= x < 2.375
+    x_new += ((2.375 <= x_abs) & (x_abs < 5)) * (0.03125 * x_abs + 0.84375)
+    x_new += (5 <= x_abs) * 1
+    x_new += (x < 0) * (1 - 2*x_new) # negative
+    return x_new
+
+def approx3(x: torch.Tensor):
+    x_new = torch.zeros(x.size(), dtype=x.dtype, device=x.device)
+    x_new += (x <= -4) * (0)
+    x_new += ((-4 < x) & (x <= 0)) * ( 0.5 * (1 - 0.25*(-x))**2 )
+    x_new += ((0 < x) & (x <= 4)) * ( 1 - ( 0.5 * (1 - 0.25*(x))**2 ) ) # 1.6 <= x <= 8
+    x_new += (4 < x) * 1
+    return x_new
+
 class Experimental(nn.Module):
     def __init__(self) -> None:
         super().__init__()
-        self.fn = nn.SiLU(inplace=True)
 
     def forward(self, x):
-        return self.fn(x)
+        return x * approx1(x)
         
     def extra_repr(self) -> str:
-        return ''
+        return 'polynomial approximation'
 
 
 class Conv(nn.Module):
